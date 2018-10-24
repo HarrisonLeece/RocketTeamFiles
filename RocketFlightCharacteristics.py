@@ -9,12 +9,14 @@ from rocketRK4 import RK4
 # gravity, isp, atmosphere and thrust are assumed constant
 # Units should be in slug for imperial and kg for metric
 gravity = 32.2
-mass = (700/gravity)
-finalMass = (70/gravity)
+mass = (600/gravity)
+finalMass = (100/gravity)
 isp = 290
-thrust = 2000
-Area = 3.1416 * 1/4 * 1.333
-Cd = 0.275
+thrust = 3000
+Area = 3.1416 * 1/4 * 1
+# A Supersonic fighter has a Cd of .016.  Subsonic is .012 therefore
+# A rocket = .01?
+Cd = .05
 
 #Establishes mDot from thrust, gravity and isp
 mDot = thrust/(gravity * isp)
