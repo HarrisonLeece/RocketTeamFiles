@@ -21,23 +21,23 @@ def RK4(t, v, m, mDry, Cd, thrust, mDot, gravity, A, h):
     m3 = m - mDot*h
     
     if (m > mDry):
-        k1 = h*((thrust/m) - gravity - (.5 * A * .0765 * Cd/m * (v)**2))
+        k1 = h*((thrust/m) - gravity - (.5 * A * .002377 * Cd/m * (v)**2))
         v2 = v + (k1/2)
-        k2 = h*((thrust/m2) - gravity - (.5 * A * .0765 * Cd/m2 * (v2)**2))
+        k2 = h*((thrust/m2) - gravity - (.5 * A * .002377 * Cd/m2 * (v2)**2))
         v3 = v + (k2/2)
-        k3 = h*((thrust/m2) - gravity - (.5 * A * .0765 * Cd/m2 * (v3)**2))
+        k3 = h*((thrust/m2) - gravity - (.5 * A * .002377 * Cd/m2 * (v3)**2))
         v4 = v + (k3)
-        k4 = h*((thrust/m3) - gravity - (.5 * A * .0765 * Cd/m3 * (v4)**2))
+        k4 = h*((thrust/m3) - gravity - (.5 * A * .002377 * Cd/m3 * (v4)**2))
         
         #print('engine on')
     else:   
-        k1 = h*(0 - gravity - (.5 * A *  .0765 * Cd/m * (v)**2))
+        k1 = h*(0 - gravity - (.5 * A *  .002377 * Cd/m * (v)**2))
         v2 = v + (k1/2)
-        k2 = h*(0 - gravity - (.5 * A *  .0765 * Cd/m2 * (v2)**2))
+        k2 = h*(0 - gravity - (.5 * A *  .002377 * Cd/m2 * (v2)**2))
         v3 = v + (k2/2)
-        k3 = h*(0 - gravity - (.5 * A *  .0765 * Cd/m2 * (v3)**2))
+        k3 = h*(0 - gravity - (.5 * A *  .002377 * Cd/m2 * (v3)**2))
         v4 = v + (k3)
-        k4 = h*(0 - gravity - (.5 * A *  .0765 * Cd/m3 * (v4)**2))
+        k4 = h*(0 - gravity - (.5 * A *  .002377 * Cd/m3 * (v4)**2))
         
         #print('engine off')
     
