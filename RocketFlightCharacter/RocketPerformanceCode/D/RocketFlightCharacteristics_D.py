@@ -7,6 +7,7 @@ import math
 import numpy as np
 from rocketRK4_D import RK4
 import matplotlib.pyplot as plt
+from atmosphereDensity import seMagic as compDensity
 
 
 # Inputs
@@ -71,11 +72,7 @@ for thrust in range_thrust:
 	while (True):
 
 		# Calculates atmospheric density at altitude x and passes density to RK4 fxn.
-		# Needs a higher order curve fit to eliminate the else statement
-		if (x < 150323):
-			rho= (4.2029*10**-29)*x**5 -(9.9848*10**-24)*x**4 - (1.4468*10**-18)*x**3 + (6.4581*10**-13)*x**2 - (6.7718*10**-8)*x + (2.3770*10**-3)
-		else:
-			rho = 0.0000037
+		rho = compDensity(x)
 		v = RK4(t,v, mass, finalMass, Cd, thrust, mDot, gravity, Area, stepSize, rho)
 
 		if v > 0:
