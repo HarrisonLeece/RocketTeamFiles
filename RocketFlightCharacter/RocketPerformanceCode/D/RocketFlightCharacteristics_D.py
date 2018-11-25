@@ -8,12 +8,13 @@ import numpy as np
 from rocketRK4_D import RK4
 import matplotlib.pyplot as plt
 from atmosphereDensity import seMagic as compDensity
+from thrustCurve import newThrustMdot as compThrust
 
 
 # Inputs
 # gravity, isp, atmosphere and thrust are assumed constant
 # Units of mass should be in slug for imperial and kg for metric.
-gravity = 32.2
+gravity = 32.174
 #Mass supposed by Rick Loehr in his calculations (80 lbs propellant)
 mass = (120/gravity)
 #initialMass variable allows the mass of the rocket to be reset durring outer for loop
@@ -21,15 +22,18 @@ initialMass = mass
 
 #Typical pressure-fed systems have a propellant weight to total weight ratio of
 # .89  .85 or less is more probable on amateur rockets
-propellantMass = .80 * mass
-finalMass = mass - propellantMass
+prRatio = .80
+propellantMass = prRatio * mass
+#finalMass is used to determine if the rocket is thrusting or not...
+#I want to get rid of this variable and replace it with when mDot is 0 stop thrusting... soon
+finalMass = (mass - propellantMass)
 #ISp of 230 for estimate of ISP of LR101
 isp = 230
 #8 inches diameter
 diameter = 2/3
 Area = 3.1416 * 1/4 * (diameter)**2
-# Assume .2 at ground and low velocity/laminar flow
-Cd = .2
+# Assume .25 at ground and low velocity
+Cd = .25
 
 #Step size of calculations.  Smaller number = higher precision
 #Unit is seconds.  .01 is the size of Rick Loehr's step size
@@ -40,8 +44,8 @@ stepSize = .005
 # Eqaution is modified in RK4.py file
 
 
-#Just 1200 lbf, range is to allow faster optimization of engine mass if desired
-range_thrust=range(1200,1201,250)
+#Just 1000 lbf, range is to allow faster optimization of engine thrust if desired
+range_thrust=range(1000,1001,250)
 print(range_thrust)
 xGraph = np.array([0])
 vGraph = np.array([0])
@@ -59,6 +63,7 @@ for thrust in range_thrust:
 	currentVelocity = 0
 
 	mass = initialMass
+	propellantMass = prRatio * mass
 
 
 
@@ -67,28 +72,28 @@ for thrust in range_thrust:
 	#Establishes mDot from thrust, gravity and isp
 	mDot = thrust/(gravity * isp)
 	print(thrust)
-	print(mDot)
+	print('Starting mDot: ' + str(mDot))
 
 	while (True):
-
-		# Calculates atmospheric density at altitude x and passes density to RK4 fxn.
+		#Calculates atmospheric density at altitude x and passes density to RK4 fxn.
 		rho = compDensity(x)
-		v = RK4(t,v, mass, finalMass, Cd, thrust, mDot, gravity, Area, stepSize, rho)
+		#Calculates mDot and thrust as tank pressure drops
+		nThrust, nMdot = compThrust(thrust, mDot, (initialMass * prRatio) , propellantMass)
+		#Calculates Cd as a fx of mach number
+		#Function in progress by Bailey 
+		#RK4 fxn
+		v = RK4(t,v, mass, finalMass, Cd, nThrust, nMdot, gravity, Area, stepSize, rho)
 
 		if v > 0:
-
 			if (mass > finalMass):
-
-				mass = mass - mDot * stepSize
+				mass = mass - nMdot * stepSize
+				propellantMass = propellantMass - nMdot * stepSize
 				burnOutTime = t
 				burnOutVelocity = v
-
 			else:
 				#Leave this for clarity, though redundant
 				mass = mass
-
 			#Computes current displacement using reimen sum
-
 			x = x + ((currentVelocity + v)/2 * stepSize)
 
 			xGraph = np.append(xGraph, x)
@@ -96,13 +101,8 @@ for thrust in range_thrust:
 			currentVelocity = v
 
 			#steps the while loop forward in time
-
-			####print('check' + str(t))
-
 			t = t + stepSize
-
 			tGraph = np.append(tGraph,t)
-			#print(x)
 		else:
 			break
 
