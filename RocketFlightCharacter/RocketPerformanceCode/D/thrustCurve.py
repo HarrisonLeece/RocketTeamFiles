@@ -16,9 +16,18 @@ def newThrustMdot(initialThrust,initialMdot, inMass, curMass):
     nThrust = initialThrust * ratio
     #Remember: initialMdot is computed from thrust/(g*isp) outside of main while loop
     nMdot = initialMdot * ratio
-
-###   if nMdot< (.5 * initialMdot):
-###        thrust = 0
+    
+    #print(initialThrust)
+    #print(nThrust)
+    #print(nMdot)
+    
+    #Very important peice of logic; I assume thrust will cut out before tanks are dry
+    #Because thrust chamber will not attain sonic at throat
+    #Turns off thrust, which will then control RK4 and burnout time logic.
+    if nMdot< (.5 * initialMdot):
+        nThrust = 0
+    if (nMdot < .0002):
+        nMdot = 0
     return nThrust, nMdot
 
 
@@ -37,7 +46,7 @@ h=.005
 mDot = 1
 thrustGraph = np.array([iThrust])
 tGraph = np.array([0])
-while (mDot > .06):
+while (mDot > .002):
 
     thrust, mDot = newThrustMdot(iThrust, initialMdot, initialMass, pM)
     pM = pM - mDot * h
@@ -45,5 +54,8 @@ while (mDot > .06):
     t = t + h
     thrustGraph = np.append(thrustGraph,thrust)
 
+plt.title('Thrust curve')
+plt.ylabel('Thrust, lbs')
+plt.xlabel('Time in seconds, step is .005')
 plt.plot(tGraph,thrustGraph)
 plt.show()

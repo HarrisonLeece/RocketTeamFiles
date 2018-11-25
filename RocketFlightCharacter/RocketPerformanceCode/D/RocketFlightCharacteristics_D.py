@@ -47,6 +47,7 @@ stepSize = .005
 #Just 1000 lbf, range is to allow faster optimization of engine thrust if desired
 range_thrust=range(1000,1001,250)
 print(range_thrust)
+#initialize graphing arrays
 xGraph = np.array([0])
 vGraph = np.array([0])
 tGraph = np.array([0])
@@ -84,12 +85,20 @@ for thrust in range_thrust:
 		#RK4 fxn
 		v = RK4(t,v, mass, finalMass, Cd, nThrust, nMdot, gravity, Area, stepSize, rho)
 
-		if v > 0:
-			if (mass > finalMass):
+		# Greater than 30 so that program will terminate when velocity is trivial
+		# or t<10 to make sure loop does not break when object is first accelerating
+		if (v > 30) or (t < 10):
+			if (nThrust > 0 and (mass > finalMass)):
 				mass = mass - nMdot * stepSize
 				propellantMass = propellantMass - nMdot * stepSize
 				burnOutTime = t
 				burnOutVelocity = v
+				thrustAtBO = nThrust
+				nMdotAtBO = nMdot
+			#Thrust is off, but propellant is still being drained by the pressurant fluid
+			elif (nThrust == 0 and nMdot != 0):
+				mass = mass - nMdot * stepSize
+				propellantMass = propellantMass - nMdot * stepSize
 			else:
 				#Leave this for clarity, though redundant
 				mass = mass
@@ -108,9 +117,12 @@ for thrust in range_thrust:
 
 	print('Burnout at ' + str(burnOutTime) + ' seconds')
 	print('Burnout velocity ' + str(burnOutVelocity) + ' feet/seconds' )
+	print('Thrust before BO: ' + str(thrustAtBO))
+	print('mDot before BO: ' + str(nMdotAtBO) + '\n')
 	print("Time to apopapsis: " + str(t))
 	print('Displacement '+ str(x) + ' feet') #Added the label of displacement here... displacement or altitude?
 	print("Goal displacement = " + str(5280 * 63) + "Feet ")
+	print("Current mass - theoretical dry mass: " + str(mass - finalMass))
 
 
 
