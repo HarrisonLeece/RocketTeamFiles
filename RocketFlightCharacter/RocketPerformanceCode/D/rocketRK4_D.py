@@ -21,48 +21,28 @@ def RK4(t, v, m, mDry, Cd, thrust, mDot, gravity, A, h,r):
 ####m3 is for k4.  in effect is t+h
     m3 = m - mDot*h
 	
-    #Thrust on statement
-    if (m > mDry):
-        # Try catch trades tiny speed increases for debugging efficiency
-        try:
-            k1 = h*((thrust/m) - gravity - (.5 * A * r * Cd/m * (v)**2))
-            v2 = v + (k1/2)
-            k2 = h*((thrust/m2) - gravity - (.5 * A * r * Cd/m2 * (v2)**2))
-            v3 = v + (k2/2)
-            k3 = h*((thrust/m2) - gravity - (.5 * A * r * Cd/m2 * (v3)**2))
-            v4 = v + (k3)
-            k4 = h*((thrust/m3) - gravity - (.5 * A * r * Cd/m3 * (v4)**2))
-        except:
-            print("\nlikely overflow:  current system properties print")
-            print('engine on')
-            print("Thrust: " +str(thrust))
-            print("Mass: " + str(m))
-            print("DryMass: " + str(mDry))
-            print("Velocity: " + str(v))
-            print("Atmospheric Density: " + str(r))
-            print("Step Size sanity check: " + str(h))
-            print("Time sanity check: " + str(t))
-    #Thrust off statement
-    else:   
-        # Try catch trades tiny speed increases for debugging efficiency
-        try:
-            k1 = h*(0 - gravity - (.5 * A *  r * Cd/m * (v)**2))
-            v2 = v + (k1/2)
-            k2 = h*(0 - gravity - (.5 * A *  r * Cd/m2 * (v2)**2))
-            v3 = v + (k2/2)
-            k3 = h*(0 - gravity - (.5 * A *  r * Cd/m2 * (v3)**2))
-            v4 = v + (k3)
-            k4 = h*(0 - gravity - (.5 * A *  r * Cd/m3 * (v4)**2))
-        except:
-            print("\nlikely overflow:  current system properties print")
-            print('engine off')
-            print("Thrust: " +str(thrust))
-            print("Mass: " + str(m))
-            print("DryMass: " + str(mDry))
-            print("Velocity: " +str(v))
-            print("Atmospheric Density: " + str(r))
-            print("Step Size sanity check: " + str(h))
-            print("Time sanity check: " + str(t))
+    #Thrust is controlled by thrustCurve.py and will turn off when thrust
+    #is approx half of initial
+    # Try catch trades tiny speed increases for debugging efficiency
+    try:
+        k1 = h*((thrust/m) - gravity - (.5 * A * r * Cd/m * (v)**2))
+        v2 = v + (k1/2)
+        k2 = h*((thrust/m2) - gravity - (.5 * A * r * Cd/m2 * (v2)**2))
+        v3 = v + (k2/2)
+        k3 = h*((thrust/m2) - gravity - (.5 * A * r * Cd/m2 * (v3)**2))
+        v4 = v + (k3)
+        k4 = h*((thrust/m3) - gravity - (.5 * A * r * Cd/m3 * (v4)**2))
+    except:
+        print("\nlikely overflow:  current system properties print")
+        print('engine on')
+        print("Thrust: " +str(thrust))
+        print("Mass: " + str(m))
+        print("DryMass: " + str(mDry))
+        print("Velocity: " + str(v))
+        print("Atmospheric Density: " + str(r))
+        print("Step Size sanity check: " + str(h))
+        print("Time sanity check: " + str(t))
+
     newVelocity = v + ((k1 + 2*k2 + 2*k3 + k4)/6)
 	
     #print('Velocity: ' + str(newVelocity))
