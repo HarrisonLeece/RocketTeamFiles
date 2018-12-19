@@ -22,9 +22,9 @@ def newThrustMdot(initialThrust,initialMdot, inMass, curMass):
     #print(nMdot)
     
     #Very important peice of logic; I assume thrust will cut out before tanks are dry
-    #Because thrust chamber will not attain sonic at throat
+    #Because gasses will not attain sonic velocity at throat
     #Turns off thrust, which will then control RK4 and burnout time logic.
-    if nMdot< (.5 * initialMdot):
+    if nMdot< (.3 * initialMdot):
         nThrust = 0
     if (nMdot < .0002):
         nMdot = 0
@@ -33,29 +33,29 @@ def newThrustMdot(initialThrust,initialMdot, inMass, curMass):
 
 
 #testing code for newThrustMdot
-t = 0
-tGraph = np.array([])
-iThrust = 1000
-g = 32.174
-isp = 230
-initialMdot = iThrust/(g*isp)
-initialMass = 95/g
-pM = initialMass
-h=.005
-
-mDot = 1
-thrustGraph = np.array([iThrust])
-tGraph = np.array([0])
-while (mDot > .002):
-
-    thrust, mDot = newThrustMdot(iThrust, initialMdot, initialMass, pM)
-    pM = pM - mDot * h
-    tGraph = np.append(tGraph,t)
-    t = t + h
-    thrustGraph = np.append(thrustGraph,thrust)
-
-plt.title('Thrust curve')
-plt.ylabel('Thrust, lbs')
-plt.xlabel('Time in seconds, step is .005')
-plt.plot(tGraph,thrustGraph)
-plt.show()
+##t = 0
+##tGraph = np.array([])
+##iThrust = 2000
+##g = 32.174
+##isp = 230
+##initialMdot = iThrust/(g*isp)
+##initialMass = 95/g
+##pM = initialMass
+##h=.005
+##
+##mDot = 1
+##thrustGraph = np.array([iThrust])
+##tGraph = np.array([0])
+##while (mDot > .002):
+##
+##    thrust, mDot = newThrustMdot(iThrust, initialMdot, initialMass, pM)
+##    pM = pM - mDot * h
+##    tGraph = np.append(tGraph,t)
+##    t = t + h
+##    thrustGraph = np.append(thrustGraph,thrust)
+##
+##plt.title('Thrust curve')
+##plt.ylabel('Thrust, lbs')
+##plt.xlabel('Time in seconds, step is .005')
+##plt.plot(tGraph,thrustGraph)
+##plt.show()

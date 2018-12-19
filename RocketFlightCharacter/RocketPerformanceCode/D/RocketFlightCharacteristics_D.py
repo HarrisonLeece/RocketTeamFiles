@@ -9,28 +9,31 @@ from rocketRK4_D import RK4
 import matplotlib.pyplot as plt
 from atmosphereDensity import seMagic as compDensity
 from thrustCurve import newThrustMdot as compThrust
+from waveDrag import compTemp
+from waveDrag import compMach
+from waveDrag import waveDrag
 
 
 # Inputs
 # gravity, isp, atmosphere and thrust are assumed constant
 # Units of mass should be in slug for imperial and kg for metric.
 gravity = 32.174
-#Mass supposed by Rick Loehr in his calculations (80 lbs propellant)
-mass = (120/gravity)
+#Mass 
+mass = (700/gravity)
 #initialMass variable allows the mass of the rocket to be reset durring outer for loop
 initialMass = mass
 
 #Typical pressure-fed systems have a propellant weight to total weight ratio of
 # .89  .85 or less is more probable on amateur rockets
-prRatio = .80
+prRatio = .75
 propellantMass = prRatio * mass
 #finalMass is used to determine if the rocket is thrusting or not...
 #I want to get rid of this variable and replace it with when mDot is 0 stop thrusting... soon
 finalMass = (mass - propellantMass)
-#ISp of 230 for estimate of ISP of LR101
-isp = 230
-#8 inches diameter
-diameter = 2/3
+#Specific impulse
+isp = 250
+#10 inches diameter
+diameter = 10/12
 Area = 3.1416 * 1/4 * (diameter)**2
 # Assume .25 at ground and low velocity
 Cd = .25
@@ -44,8 +47,8 @@ stepSize = .005
 # Eqaution is modified in RK4.py file
 
 
-#Just 1000 lbf, range is to allow faster optimization of engine thrust if desired
-range_thrust=range(1000,1001,250)
+#range is to allow faster optimization of engine thrust if desired
+range_thrust=range(3000,4001,250)
 print(range_thrust)
 #initialize graphing arrays
 xGraph = np.array([0])
@@ -81,10 +84,13 @@ for thrust in range_thrust:
 		#Calculates mDot and thrust as tank pressure drops
 		nThrust, nMdot = compThrust(thrust, mDot, (initialMass * prRatio) , propellantMass)
 		#Calculates Cd as a fx of mach number
-		#Function in progress by Bailey 
+		K = compTemp(x)
+		mach = compMach(v,K)
+		nCd = waveDrag(Cd,mach)
 		#RK4 fxn
-		v = RK4(t,v, mass, finalMass, Cd, nThrust, nMdot, gravity, Area, stepSize, rho)
-
+		v = RK4(t,v, mass, finalMass, nCd, nThrust, nMdot, gravity, Area, stepSize, rho)
+		
+		
 		# Greater than 30 so that program will terminate when velocity is trivial
 		# or t<10 to make sure loop does not break when object is first accelerating
 		if (v > 30) or (t < 10):
