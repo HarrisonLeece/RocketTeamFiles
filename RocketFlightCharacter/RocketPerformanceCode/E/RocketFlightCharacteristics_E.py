@@ -5,7 +5,7 @@
 
 import math
 import numpy as np
-from rocketRK4_D import RK4
+from rocketRK4 import RK4
 import matplotlib.pyplot as plt
 from atmosphereDensity import seMagic as compDensity
 from thrustCurve import newThrustMdot as compThrust
